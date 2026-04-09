@@ -1,4 +1,21 @@
 module.exports = {
+  cashflowQuery: {
+    $id: 'cashflowQuery',
+    type: 'object',
+    properties: {
+      category: { type: 'string' },
+      type: { type: 'string', enum: ['income', 'expense'] },
+      dateMin: { type: 'string', format: 'date-time' },
+      dateMax: { type: 'string', format: 'date-time' },
+      amountMin: { type: 'number', minimum: 0 },
+      amountMax: { type: 'number', minimum: 0 },
+      sorter: { type: 'string' },
+      count: { type: 'boolean' },
+      nextKey: { type: 'string' },
+      limit: { type: 'number', minimum: 0 }
+    },
+    additionalProperties: false
+  },
   createCashFlow: {
     $id: 'createCashFlow',
     type: 'object',

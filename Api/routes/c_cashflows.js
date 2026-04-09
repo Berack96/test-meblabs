@@ -8,7 +8,7 @@ const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(isAuth, rbac('cashflows', 'read'), controller.get)
+  .get(validator({ query: 'cashflowQuery' }), isAuth, rbac('cashflows', 'read'), controller.get)
   .post(validator('createCashFlow'), isAuth, rbac('cashflows', 'create'), controller.create);
 
 router

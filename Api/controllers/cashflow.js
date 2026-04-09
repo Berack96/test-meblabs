@@ -1,5 +1,5 @@
 const CashFlow = require('../models/cashflow');
-const { SendData, ServerError, NotFound, AlreadyExists, Unauthorized } = require('../helpers/response');
+const { SendData, ServerError, NotFound, Unauthorized } = require('../helpers/response');
 const { canGetCashFlow, canUpdateCashFlow, canDeleteCashFlow } = require('../rbac/cashflow');
 const getter = require('../helpers/getter');
 
@@ -75,7 +75,6 @@ module.exports.create = async (req, { locals: { user, company } }, next) => {
 
     return next(SendData(data.response('detail')));
   } catch (err) {
-    if (err.code === 11000) return next(AlreadyExists());
     return next(ServerError(err));
   }
 };
