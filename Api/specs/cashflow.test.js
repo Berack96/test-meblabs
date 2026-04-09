@@ -144,70 +144,24 @@ afterAll(async () => await db.close());
 
 describe('Role: Superuser', () => {
   describe('GET /companies/:companyId/cashflows', () => {
-    test('Get all cashflows of a company', () =>
+    test('Get only own cashflows of a company', () =>
       agent
         .get(`/companies/${company1.id}/cashflows?sorter=date`)
         .set('Cookie', `accessToken=${superToken}`)
         .expect(200)
         .then(res => {
-          expect(res.body).toStrictEqual([
-            {
-              _id: adminCashflow.id,
-              type: 'income',
-              amount: 150000,
-              date: '2026-01-10T10:00:00.000Z',
-              category: 'salary',
-              createdAt: expect.any(String)
-            },
-            {
-              _id: userCashflow.id,
-              type: 'expense',
-              amount: 5000,
-              date: '2026-01-11T10:00:00.000Z',
-              category: 'food',
-              createdAt: expect.any(String)
-            }
-          ]);
+          expect(res.body).toStrictEqual([]);
         }));
 
-    test('Get all cashflows paginated', () =>
+    test('Get own cashflows paginated', () =>
       agent
         .get(`/companies/${company1.id}/cashflows?sorter=date&count=true&limit=1`)
         .set('Cookie', `accessToken=${superToken}`)
         .expect(200)
         .then(res => {
-          expect(res.body).toStrictEqual([
-            {
-              _id: adminCashflow.id,
-              type: 'income',
-              amount: 150000,
-              date: '2026-01-10T10:00:00.000Z',
-              category: 'salary',
-              createdAt: expect.any(String)
-            }
-          ]);
-
-          const nextKey = res.headers['x-next-key'];
-          expect(JSON.parse(nextKey)).toStrictEqual({ _id: adminCashflow.id, date: '2026-01-10T10:00:00.000Z' });
-          expect(res.headers['x-total-count']).toBe('2');
-
-          return agent
-            .get(`/companies/${company1.id}/cashflows?sorter=date&limit=1&nextKey=${nextKey}`)
-            .set('Cookie', `accessToken=${superToken}`)
-            .expect(200);
-        })
-        .then(res =>
-          expect(res.body).toStrictEqual([
-            {
-              _id: userCashflow.id,
-              type: 'expense',
-              amount: 5000,
-              date: '2026-01-11T10:00:00.000Z',
-              category: 'food',
-              createdAt: expect.any(String)
-            }
-          ])
-        ));
+          expect(res.body).toStrictEqual([]);
+          expect(res.headers['x-total-count']).toBe('0');
+        }));
   });
 
   describe('GET /companies/:companyId/cashflows/:id', () => {
@@ -359,21 +313,13 @@ describe('Role: Admin', () => {
 
 describe('Role: User', () => {
   describe('GET /companies/:companyId/cashflows', () => {
-    test('Get all cashflows in own company', () =>
+    test('Get only own cashflows in own company', () =>
       agent
         .get(`/companies/${company1.id}/cashflows?sorter=date`)
         .set('Cookie', `accessToken=${userToken}`)
         .expect(200)
         .then(res =>
           expect(res.body).toStrictEqual([
-            {
-              _id: adminCashflow.id,
-              type: 'income',
-              amount: 150000,
-              date: '2026-01-10T10:00:00.000Z',
-              category: 'salary',
-              createdAt: expect.any(String)
-            },
             {
               _id: userCashflow.id,
               type: 'expense',

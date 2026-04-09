@@ -44,6 +44,7 @@ module.exports.get = async (req, res, next) => {
   try {
     const query = cashflowQuery(req.query);
     query['company.id'] = res.locals.company.id;
+    query.user = res.locals.user.id;
     const data = await getter(CashFlow, query, req, res, CashFlow.getFields('listing'));
 
     return next(SendData(data));
