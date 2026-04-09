@@ -21,7 +21,11 @@ const schema = Schema(
         required: true,
         index: true
       },
-      name: String
+      name: {
+        type: String,
+        maxlength: 128,
+        trim: true
+      }
     },
     date: {
       type: Date,
@@ -59,6 +63,7 @@ schema.plugin(softDelete);
 schema.plugin(dbFields, {
   fields: {
     listing: ['_id', 'type', 'amount', 'date', 'category', 'createdAt'],
+    public: ['_id', 'type', 'amount', 'date', 'category', 'description', 'createdAt', 'updatedAt'],
     detail: ['_id', 'type', 'amount', 'date', 'category', 'description', 'createdAt', 'updatedAt', 'user', 'company']
   }
 });

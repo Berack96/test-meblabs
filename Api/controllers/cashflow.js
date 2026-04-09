@@ -43,6 +43,7 @@ const newHistory = (user, event, method) => ({
 module.exports.get = async (req, res, next) => {
   try {
     const query = cashflowQuery(req.query);
+    query.company = { _id: res.locals.company };
     const data = await getter(CashFlow, query, req, res, CashFlow.getFields('listing'));
 
     return next(SendData(data));
@@ -67,7 +68,7 @@ module.exports.create = async (req, { locals: { user } }, next) => {
   try {
     const data = new CashFlow(req.body);
     data.user = user.id;
-    data.company = user.company.id;
+    data.company = req.locals.company;
 
     data.__history = newHistory(user, 'create', 'create');
     await data.save();

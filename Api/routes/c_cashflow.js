@@ -4,12 +4,12 @@ const { isAuth } = require('../middlewares/isAuth');
 const rbac = require('../middlewares/rbac');
 const { validator } = require('../middlewares/validator');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(isAuth, rbac('cashflows', 'read:any'), controller.get)
-  .post(validator('createCashFlow'), isAuth, rbac('cashflows', 'create:any'), controller.create);
+  .get(isAuth, rbac('cashflows', 'read'), controller.get)
+  .post(validator('createCashFlow'), isAuth, rbac('cashflows', 'create'), controller.create);
 
 router
   .route('/:id')
