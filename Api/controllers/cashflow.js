@@ -43,7 +43,7 @@ const newHistory = (user, event, method) => ({
 module.exports.get = async (req, res, next) => {
   try {
     const query = cashflowQuery(req.query);
-    query.company = { id: res.locals.company.id };
+    query['company.id'] = res.locals.company.id;
     const data = await getter(CashFlow, query, req, res, CashFlow.getFields('listing'));
 
     return next(SendData(data));
@@ -80,7 +80,7 @@ module.exports.create = async (req, { locals: { user, company } }, next) => {
   }
 };
 
-exports.update = async ({ params: { id }, body }, { locals: { user, company } }, next) => {
+exports.update = async ({ params: { id }, body }, { locals: { user } }, next) => {
   try {
     const data = await canUpdateCashFlow(user, id);
     if (data === null) return next(NotFound());
