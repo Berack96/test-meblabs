@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useContext } from 'react';
-import { Button, Modal, Tag, Form, DatePicker, Input, Row, Col } from 'antd';
+import { Button, Modal, Tag, Form, DatePicker, Input, Row, Col, Select, InputNumber } from 'antd';
 import dayjs from 'dayjs';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,7 @@ import MessageContext from '../helpers/core/MessageContext';
 import Table from '../components/core/table/Table';
 import ContentPanel from '../components/core/layout/ContentPanel';
 import CashFlowApi from '../helpers/api/cashflow';
+import { useFilters } from '../components/core/table/Filters';
 
 const Cashflow = () => {
   /* Cose Globali */
@@ -30,6 +31,15 @@ const Cashflow = () => {
 
   /* Variabili per i dati */
   const [dataSource, setDataSource] = useState([]);
+  const [filtersForm] = Form.useForm();
+  const [queryFilters, setQueryFilters] = useState({});
+  const filters = useFilters('cashflow');
+  const onFilterSubmit = () => setQueryFilters(filtersForm.getFieldsValue());
+  const onFilterClear = formToClear => {
+    filters.onClearFilters(formToClear);
+    setQueryFilters({});
+  };
+
   const columns = [
     {
       title: t('cashflow.table.date'),
@@ -130,7 +140,7 @@ const Cashflow = () => {
     async function fetchData() {
       try {
         setLoading(true);
-        const response = await CashFlowApi.listLatest(30);
+        const response = await CashFlowApi.list(queryFilters);
         setDataSource(response.data);
       } catch (error) {
         msgErr('cashflow-load', error);
@@ -141,7 +151,7 @@ const Cashflow = () => {
     }
 
     fetchData();
-  }, [msgErr]);
+  }, [msgErr, queryFilters]);
 
   /* Pagina */
   return (
@@ -158,6 +168,62 @@ const Cashflow = () => {
         columns={columns}
         dataSource={dataSource}
         loading={loading}
+        filters={{
+          layout: (
+            <Form form={filtersForm} layout="vertical" onFinish={onFilterSubmit}>
+              <Form.Item name="type" label={t('cashflow.table.type')}>
+                <Select
+                  allowClear
+                  options={[
+                    { value: 'income', label: t('cashflow.type.income') },
+                    { value: 'expense', label: t('cashflow.type.expense') }
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item name="category" label={t('cashflow.table.category')}>
+                <Input allowClear />
+              </Form.Item>
+              <Row>
+                <Col span={12}>
+                  <Form.Item name="dateMin" label={t('cashflow.table.date')}>
+                    <DatePicker placeholder={t('cashflow.table.dateMin')} format="DD/MM/YYYY" />
+                  </Form.Item>
+                </Col>
+                <Col>
+                  <Form.Item name="dateMax" label=" ">
+                    <DatePicker placeholder={t('cashflow.table.dateMax')} format="DD/MM/YYYY" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12}>
+                  <Form.Item name="amountMin" label={t('cashflow.table.amount')}>
+                    <InputNumber placeholder={t('cashflow.table.amountMin')} min={0} />
+                  </Form.Item>
+                </Col>
+                <Col>
+                  <Form.Item name="amountMax" label=" ">
+                    <InputNumber placeholder={t('cashflow.table.amountMax')} min={0} />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Button htmlType="button" block onClick={() => onFilterClear(filtersForm)} style={{ width: '48%' }}>
+                {t('common.delete')}
+              </Button>
+              <Button type="primary" htmlType="submit" block style={{ width: '48%', marginLeft: '2%' }}>
+                {t('common.filter')}
+              </Button>
+            </Form>
+          ),
+          form: filtersForm,
+          showFilter: filters.showFilter,
+          onCloseDrawer: filters.onCloseDrawer,
+          toggleFilter: filters.toggleFilter,
+          filterContainerClasses: filters.filterContainerClasses,
+          onClearFilters: onFilterClear,
+          hasFilters: filters.hasFilters,
+          filterIconClass: filters.filterIconClass
+        }}
         onDelete={recordDelete}
         deleteSaveButtonOnRow
         onEdit={record => openModal(record)}

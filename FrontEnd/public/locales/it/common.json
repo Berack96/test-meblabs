@@ -78,9 +78,13 @@
     "title": "Flusso di cassa",
     "table": {
       "date": "Data",
+      "dateMin": "Data Inizio",
+      "dateMax": "Data Fine",
       "type": "Tipo",
       "category": "Categoria",
       "amount": "Importo",
+      "amountMin": "Importo Minimo",
+      "amountMax": "Importo Massimo",
       "description": "Descrizione"
     },
     "type": {
