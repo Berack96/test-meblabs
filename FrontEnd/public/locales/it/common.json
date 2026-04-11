@@ -80,7 +80,8 @@
       "date": "Data",
       "type": "Tipo",
       "category": "Categoria",
-      "amount": "Importo"
+      "amount": "Importo",
+      "description": "Descrizione"
     },
     "type": {
       "income": "Entrata",

@@ -80,7 +80,8 @@
       "date": "Date",
       "type": "Type",
       "category": "Category",
-      "amount": "Amount"
+      "amount": "Amount",
+      "description": "Description"
     },
     "type": {
       "income": "Income",

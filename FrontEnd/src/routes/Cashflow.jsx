@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useContext } from 'react';
-import { Button, Modal, Tag, Form, DatePicker, Input, Radio } from 'antd';
+import { Button, Modal, Tag, Form, DatePicker, Input, Row, Col } from 'antd';
 import dayjs from 'dayjs';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,6 +16,17 @@ const Cashflow = () => {
   const { t } = useTranslation();
   const { errorMsg: msgErr } = useContext(MessageContext);
   const [loading, setLoading] = useState(false);
+  const getTypeTagColor = (value, selected) => {
+    if (!selected) return 'default';
+    if (value === 'income') return 'green';
+    return 'red';
+  };
+
+  const typeTag = (value, selected = true) => (
+    <Tag color={getTypeTagColor(value, selected)} style={{ marginInlineEnd: 0 }}>
+      {t(`cashflow.type.${value}`)}
+    </Tag>
+  );
 
   /* Variabili per i dati */
   const [dataSource, setDataSource] = useState([]);
@@ -30,11 +41,7 @@ const Cashflow = () => {
       title: t('cashflow.table.type'),
       dataIndex: 'type',
       key: 'type',
-      render: value => (
-        <div style={{ display: 'flex' }}>
-          <Tag color={value === 'income' ? 'green' : 'red'}>{t(`cashflow.type.${value}`)}</Tag>
-        </div>
-      )
+      render: value => <div style={{ display: 'flex' }}>{typeTag(value)}</div>
     },
     {
       title: t('cashflow.table.category'),
@@ -80,6 +87,7 @@ const Cashflow = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEdit, setIsModalEdit] = useState(false);
   const [form] = Form.useForm();
+  const typeValue = Form.useWatch('type', form);
   const openModal = (record = null) => {
     setIsModalOpen(true);
     form.resetFields();
@@ -156,24 +164,45 @@ const Cashflow = () => {
         editCancelButtonOnRow
         pagination={false}
       />
-      <Modal title={t('cashflow.form.title')} open={isModalOpen} onCancel={closeModal} onOk={onModalSubmit}>
-        <Form form={form} layout="vertical">
-          <Form.Item name="date" label={t('cashflow.form.date')} rules={[{ required: true }]}>
-            <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+      <Modal title={t('cashflow.title')} open={isModalOpen} onCancel={closeModal} onOk={onModalSubmit}>
+        <Form form={form} layout="horizontal">
+          <Row gutter={24}>
+            <Col>
+              <Form.Item name="date" label={t('cashflow.table.date')} rules={[{ required: true }]}>
+                <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item label={t('cashflow.table.type')} required>
+                <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                  <button
+                    type="button"
+                    onClick={() => form.setFieldValue('type', 'income')}
+                    style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                  >
+                    {typeTag('income', typeValue === 'income')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => form.setFieldValue('type', 'expense')}
+                    style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                  >
+                    {typeTag('expense', typeValue === 'expense')}
+                  </button>
+                </div>
+              </Form.Item>
+              <Form.Item name="type" hidden rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item name="amount" label={t('cashflow.table.amount')} rules={[{ required: true }]}>
+            <Input type="number" step="0.01" min={0} />
           </Form.Item>
-          <Form.Item name="type" label={t('cashflow.form.type')} rules={[{ required: true }]}>
-            <Radio.Group>
-              <Radio value="income">{t('cashflow.type.income')}</Radio>
-              <Radio value="expense">{t('cashflow.type.expense')}</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item name="amount" label={t('cashflow.form.amount')} rules={[{ required: true }]}>
-            <Input type="number" step="0.01" />
-          </Form.Item>
-          <Form.Item name="category" label={t('cashflow.form.category')}>
+          <Form.Item name="category" label={t('cashflow.table.category')}>
             <Input />
           </Form.Item>
-          <Form.Item name="description" label={t('cashflow.form.description')}>
+          <Form.Item name="description" label={t('cashflow.table.description')}>
             <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
