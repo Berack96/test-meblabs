@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useContext } from 'react';
-import { Button } from 'antd';
+import { Button, Tag } from 'antd';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -40,12 +40,18 @@ const Cashflow = () => {
     {
       title: t('cashflow.table.date'),
       dataIndex: 'date',
-      key: 'date'
+      key: 'date',
+      render: value => new Date(value).toLocaleDateString()
     },
     {
       title: t('cashflow.table.type'),
       dataIndex: 'type',
-      key: 'type'
+      key: 'type',
+      render: value => (
+        <div style={{ display: 'flex' }}>
+          <Tag color={value === 'income' ? 'green' : 'red'}>{t(`cashflow.type.${value}`)}</Tag>
+        </div>
+      )
     },
     {
       title: t('cashflow.table.category'),
@@ -55,7 +61,9 @@ const Cashflow = () => {
     {
       title: t('cashflow.table.amount'),
       dataIndex: 'amount',
-      key: 'amount'
+      key: 'amount',
+      align: 'right',
+      render: value => `${value.toFixed(2)}`
     }
   ];
 
