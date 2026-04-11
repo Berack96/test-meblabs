@@ -18,7 +18,6 @@ const schema = Schema(
       id: {
         type: Schema.Types.ObjectId,
         ref: 'Company',
-        required: true,
         index: true
       },
       name: {
