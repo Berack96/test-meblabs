@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useContext } from 'react';
-import { Button, Modal, Tag, Form } from 'antd';
+import { Button, Modal, Tag, Form, DatePicker, Input, Radio } from 'antd';
+import dayjs from 'dayjs';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -50,7 +51,7 @@ const Cashflow = () => {
   ];
 
   /* Funzioni per CRUD */
-  const onCreate = async payload => {
+  const recordCreate = async payload => {
     try {
       const response = await CashFlowApi.create(payload);
       setDataSource(array => [response.data, ...array]);
@@ -58,7 +59,7 @@ const Cashflow = () => {
       msgErr('cashflow-create', error);
     }
   };
-  const onUpdate = async (id, payload) => {
+  const recordUpdate = async (id, payload) => {
     try {
       const response = await CashFlowApi.update(id, payload);
       setDataSource(array => array.map(item => (item._id === id ? response.data : item)));
@@ -66,7 +67,7 @@ const Cashflow = () => {
       msgErr('cashflow-update', error);
     }
   };
-  const onDelete = async record => {
+  const recordDelete = async record => {
     try {
       await CashFlowApi.delete(record._id);
       setDataSource(array => array.filter(item => item._id !== record._id));
@@ -76,13 +77,44 @@ const Cashflow = () => {
   };
 
   /* Modale */
-  const form = Form.useForm();
-  const openModal = () => {
-    Modal.confirm({
-      title: t('common.new'),
-      okText: t('common.ok'),
-      cancelText: t('common.cancel')
-    });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalEdit, setIsModalEdit] = useState(false);
+  const [form] = Form.useForm();
+  const openModal = (record = null) => {
+    setIsModalOpen(true);
+    form.resetFields();
+
+    if (record) {
+      const recordCopy = { ...record, date: dayjs(record.date) };
+      form.setFieldsValue(recordCopy);
+      setIsModalEdit(true);
+    } else {
+      form.setFieldValue('date', dayjs(new Date()));
+      form.setFieldValue('type', 'expense');
+      setIsModalEdit(false);
+    }
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+  };
+  const onModalSubmit = () => {
+    form
+      .validateFields()
+      .then(values => {
+        const payload = { ...values, date: values.date.toISOString() };
+
+        if (isModalEdit) {
+          recordUpdate(form.getFieldValue('_id'), payload);
+        } else {
+          recordCreate(payload);
+        }
+
+        closeModal();
+      })
+      .catch(error => {
+        msgErr('cashflow-form-validation', error);
+      });
   };
 
   /* Dati iniziali */
@@ -108,7 +140,7 @@ const Cashflow = () => {
     <ContentPanel
       title={t('cashflow.title')}
       titleAction={
-        <Button type="primary" icon={<FontAwesomeIcon icon={faAdd} />} onClick={openModal}>
+        <Button type="primary" icon={<FontAwesomeIcon icon={faAdd} />} onClick={() => openModal()}>
           {t('common.new')}
         </Button>
       }
@@ -118,11 +150,34 @@ const Cashflow = () => {
         columns={columns}
         dataSource={dataSource}
         loading={loading}
-        onDelete={onDelete}
+        onDelete={recordDelete}
         deleteSaveButtonOnRow
+        onEdit={record => openModal(record)}
+        editCancelButtonOnRow
         pagination={false}
       />
-      <Modal title={t('cashflow.title')} open={false} />
+      <Modal title={t('cashflow.form.title')} open={isModalOpen} onCancel={closeModal} onOk={onModalSubmit}>
+        <Form form={form} layout="vertical">
+          <Form.Item name="date" label={t('cashflow.form.date')} rules={[{ required: true }]}>
+            <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+          </Form.Item>
+          <Form.Item name="type" label={t('cashflow.form.type')} rules={[{ required: true }]}>
+            <Radio.Group>
+              <Radio value="income">{t('cashflow.type.income')}</Radio>
+              <Radio value="expense">{t('cashflow.type.expense')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item name="amount" label={t('cashflow.form.amount')} rules={[{ required: true }]}>
+            <Input type="number" step="0.01" />
+          </Form.Item>
+          <Form.Item name="category" label={t('cashflow.form.category')}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label={t('cashflow.form.description')}>
+            <Input.TextArea rows={3} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </ContentPanel>
   );
 };
