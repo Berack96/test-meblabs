@@ -5,8 +5,8 @@ const cashflowRbac = async (caller, resourceId, { authorizedRoles = [], customCo
   const cashflow = await CashFlow.findById(resourceId, {});
   if (!cashflow) return null;
 
-  const { id: _id, company, roles: globalRoles } = caller;
-  const { roles: companyRoles } = company;
+  const { id: _id, company = {}, roles: globalRoles = [] } = caller;
+  const { roles: companyRoles = [] } = company;
   const roles = Array.from(new Set([...companyRoles, ...globalRoles]));
 
   if (roles.includes('superuser')) return cashflow;
