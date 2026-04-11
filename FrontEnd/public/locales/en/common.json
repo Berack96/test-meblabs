@@ -73,5 +73,14 @@
   },
   "validation": {
     "required": "Required field"
+  },
+  "cashflow": {
+    "menu": "Cashflow",
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "category": "Category",
+      "amount": "Amount"
+    }
   }
 }
