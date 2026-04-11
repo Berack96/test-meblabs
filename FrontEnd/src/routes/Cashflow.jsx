@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useContext } from 'react';
-import { Button, Tag } from 'antd';
+import { Button, Modal, Tag, Form } from 'antd';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -11,31 +11,13 @@ import ContentPanel from '../components/core/layout/ContentPanel';
 import CashFlowApi from '../helpers/api/cashflow';
 
 const Cashflow = () => {
+  /* Cose Globali */
   const { t } = useTranslation();
   const { errorMsg: msgErr } = useContext(MessageContext);
-
   const [loading, setLoading] = useState(false);
+
+  /* Variabili per i dati */
   const [dataSource, setDataSource] = useState([]);
-
-  const onCreate = async payload => {
-    const response = await CashFlowApi.create(payload);
-    setDataSource(array => [response.data, ...array]);
-  };
-
-  const onUpdate = async (id, payload) => {
-    const response = await CashFlowApi.update(id, payload);
-    setDataSource(array => array.map(item => (item._id === id ? response.data : item)));
-  };
-
-  const onDelete = async record => {
-    try {
-      await CashFlowApi.delete(record._id);
-      setDataSource(array => array.filter(item => item._id !== record._id));
-    } catch (error) {
-      msgErr('cashflow-delete', error);
-    }
-  };
-
   const columns = [
     {
       title: t('cashflow.table.date'),
@@ -67,6 +49,43 @@ const Cashflow = () => {
     }
   ];
 
+  /* Funzioni per CRUD */
+  const onCreate = async payload => {
+    try {
+      const response = await CashFlowApi.create(payload);
+      setDataSource(array => [response.data, ...array]);
+    } catch (error) {
+      msgErr('cashflow-create', error);
+    }
+  };
+  const onUpdate = async (id, payload) => {
+    try {
+      const response = await CashFlowApi.update(id, payload);
+      setDataSource(array => array.map(item => (item._id === id ? response.data : item)));
+    } catch (error) {
+      msgErr('cashflow-update', error);
+    }
+  };
+  const onDelete = async record => {
+    try {
+      await CashFlowApi.delete(record._id);
+      setDataSource(array => array.filter(item => item._id !== record._id));
+    } catch (error) {
+      msgErr('cashflow-delete', error);
+    }
+  };
+
+  /* Modale */
+  const form = Form.useForm();
+  const openModal = () => {
+    Modal.confirm({
+      title: t('common.new'),
+      okText: t('common.ok'),
+      cancelText: t('common.cancel')
+    });
+  };
+
+  /* Dati iniziali */
   useEffect(() => {
     async function fetchData() {
       try {
@@ -84,11 +103,12 @@ const Cashflow = () => {
     fetchData();
   }, [msgErr]);
 
+  /* Pagina */
   return (
     <ContentPanel
       title={t('cashflow.title')}
       titleAction={
-        <Button type="primary" icon={<FontAwesomeIcon icon={faAdd} />}>
+        <Button type="primary" icon={<FontAwesomeIcon icon={faAdd} />} onClick={openModal}>
           {t('common.new')}
         </Button>
       }
@@ -102,6 +122,7 @@ const Cashflow = () => {
         deleteSaveButtonOnRow
         pagination={false}
       />
+      <Modal title={t('cashflow.title')} open={false} />
     </ContentPanel>
   );
 };
