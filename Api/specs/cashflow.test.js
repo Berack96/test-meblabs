@@ -143,7 +143,7 @@ afterEach(() => jest.clearAllMocks());
 afterAll(async () => await db.close());
 
 describe('Role: Superuser', () => {
-  describe('GET /companies/:companyId/cashflows', () => {
+  describe('GET /cashflows', () => {
     test('Get only own cashflows of a company', () =>
       agent
         .get(`/cashflows?sorter=date`)
