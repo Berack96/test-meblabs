@@ -37,7 +37,7 @@ export const AppProvider = props => {
         authorizedRoles: ['admin', 'designer', 'manufacturer', 'owner']
       },
       {
-        label: <Link to="/cashflows">{t('cashflow.menu')}</Link>,
+        label: <Link to="/cashflows">{t('cashflow.title')}</Link>,
         key: 'cashflow',
         icon: <FontAwesomeIcon icon={faMoney} />,
         authorizedRoles: ['admin', 'designer', 'manufacturer', 'owner']

@@ -75,7 +75,7 @@
     "required": "Required field"
   },
   "cashflow": {
-    "menu": "Cashflow",
+    "title": "Cashflow",
     "table": {
       "date": "Date",
       "type": "Type",

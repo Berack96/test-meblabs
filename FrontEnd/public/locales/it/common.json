@@ -73,5 +73,14 @@
   },
   "validation": {
     "required": "Campo obbligatorio"
+  },
+  "cashflow": {
+    "title": "Flusso di cassa",
+    "table": {
+      "date": "Data",
+      "type": "Tipo",
+      "category": "Categoria",
+      "amount": "Importo"
+    }
   }
 }
