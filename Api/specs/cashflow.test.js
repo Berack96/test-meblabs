@@ -146,7 +146,7 @@ describe('Role: Superuser', () => {
   describe('GET /companies/:companyId/cashflows', () => {
     test('Get only own cashflows of a company', () =>
       agent
-        .get(`/companies/${company1.id}/cashflows?sorter=date`)
+        .get(`/cashflows?sorter=date`)
         .set('Cookie', `accessToken=${superToken}`)
         .expect(200)
         .then(res => {
@@ -155,7 +155,7 @@ describe('Role: Superuser', () => {
 
     test('Get own cashflows paginated', () =>
       agent
-        .get(`/companies/${company1.id}/cashflows?sorter=date&count=true&limit=1`)
+        .get(`/cashflows?sorter=date&count=true&limit=1`)
         .set('Cookie', `accessToken=${superToken}`)
         .expect(200)
         .then(res => {
@@ -167,7 +167,7 @@ describe('Role: Superuser', () => {
   describe('GET /companies/:companyId/cashflows/:id', () => {
     test('Get cashflow in another company', () =>
       agent
-        .get(`/companies/${company2.id}/cashflows/${otherCompanyCashflow.id}`)
+        .get(`/cashflows/${otherCompanyCashflow.id}`)
         .set('Cookie', `accessToken=${superToken}`)
         .expect(200)
         .then(res =>
@@ -194,7 +194,7 @@ describe('Role: Admin', () => {
   describe('POST /companies/:companyId/cashflows', () => {
     test('Create a cashflow', () =>
       agent
-        .post(`/companies/${company1.id}/cashflows`)
+        .post(`/cashflows`)
         .set('Cookie', `accessToken=${adminToken}`)
         .send({
           type: 'expense',
@@ -224,7 +224,7 @@ describe('Role: Admin', () => {
 
     test('Missing amount should be rejected', () =>
       agent
-        .post(`/companies/${company1.id}/cashflows`)
+        .post(`/cashflows`)
         .set('Cookie', `accessToken=${adminToken}`)
         .send({
           type: 'income',
@@ -243,7 +243,7 @@ describe('Role: Admin', () => {
 
     test('Cannot forge user in payload', () =>
       agent
-        .post(`/companies/${company1.id}/cashflows`)
+        .post(`/cashflows`)
         .set('Cookie', `accessToken=${adminToken}`)
         .send({
           type: 'income',
@@ -264,7 +264,7 @@ describe('Role: Admin', () => {
   describe('PATCH /companies/:companyId/cashflows/:id', () => {
     test('Update a cashflow', () =>
       agent
-        .patch(`/companies/${company1.id}/cashflows/${userCashflow.id}`)
+        .patch(`/cashflows/${userCashflow.id}`)
         .set('Cookie', `accessToken=${adminToken}`)
         .send({
           amount: 6000,
@@ -294,7 +294,7 @@ describe('Role: Admin', () => {
   describe('DELETE /companies/:companyId/cashflows/:id', () => {
     test('Delete a cashflow', () =>
       agent
-        .delete(`/companies/${company1.id}/cashflows/${adminCashflow.id}`)
+        .delete(`/cashflows/${adminCashflow.id}`)
         .set('Cookie', `accessToken=${adminToken}`)
         .expect(200)
         .then(res =>
@@ -303,10 +303,7 @@ describe('Role: Admin', () => {
           })
         )
         .then(() =>
-          agent
-            .get(`/companies/${company1.id}/cashflows/${adminCashflow.id}`)
-            .set('Cookie', `accessToken=${adminToken}`)
-            .expect(404)
+          agent.get(`/cashflows/${adminCashflow.id}`).set('Cookie', `accessToken=${adminToken}`).expect(404)
         ));
   });
 });
@@ -315,7 +312,7 @@ describe('Role: User', () => {
   describe('GET /companies/:companyId/cashflows', () => {
     test('Get only own cashflows in own company', () =>
       agent
-        .get(`/companies/${company1.id}/cashflows?sorter=date`)
+        .get(`/cashflows?sorter=date`)
         .set('Cookie', `accessToken=${userToken}`)
         .expect(200)
         .then(res =>
@@ -335,7 +332,7 @@ describe('Role: User', () => {
   describe('GET /companies/:companyId/cashflows/:id', () => {
     test('Get own cashflow', () =>
       agent
-        .get(`/companies/${company1.id}/cashflows/${userCashflow.id}`)
+        .get(`/cashflows/${userCashflow.id}`)
         .set('Cookie', `accessToken=${userToken}`)
         .expect(200)
         .then(res =>
@@ -358,7 +355,7 @@ describe('Role: User', () => {
 
     test('Cannot access other users cashflow', () =>
       agent
-        .get(`/companies/${company1.id}/cashflows/${adminCashflow.id}`)
+        .get(`/cashflows/${adminCashflow.id}`)
         .set('Cookie', `accessToken=${userToken}`)
         .expect(401)
         .then(res => expect(res.body).toEqual(expect.objectContaining({ error: 401 }))));
