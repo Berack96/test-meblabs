@@ -1,10 +1,19 @@
+const mongoose = require('mongoose');
 const CashFlow = require('../models/cashflow');
 const { SendData, ServerError, NotFound, Unauthorized } = require('../helpers/response');
 const { canGetCashFlow, canUpdateCashFlow, canDeleteCashFlow } = require('../rbac/cashflow');
 const getter = require('../helpers/getter');
 
-const cashflowQuery = ({ category, type, dateMax, dateMin, amountMin, amountMax }) => {
+const cashflowQuery = (user, { category, type, dateMax, dateMin, amountMin, amountMax }) => {
   const query = {};
+
+  if (user?.id) {
+    query.user = new mongoose.Types.ObjectId(user.id);
+  }
+
+  if (user?.company?.id) {
+    query['company.id'] = new mongoose.Types.ObjectId(user.company.id);
+  }
 
   if (category) {
     query.category = category;
@@ -15,11 +24,11 @@ const cashflowQuery = ({ category, type, dateMax, dateMin, amountMin, amountMax 
   }
 
   if (dateMax) {
-    query.date = { $lte: dateMax };
+    query.date = { $lte: new Date(dateMax) };
   }
 
   if (dateMin) {
-    query.date = { ...query.date, $gte: dateMin };
+    query.date = { ...query.date, $gte: new Date(dateMin) };
   }
 
   if (amountMin) {
@@ -42,9 +51,7 @@ const newHistory = (user, event, method) => ({
 
 module.exports.get = async (req, res, next) => {
   try {
-    const query = cashflowQuery(req.query);
-    query['company.id'] = res.locals.user.company?.id;
-    query.user = res.locals.user.id;
+    const query = cashflowQuery(res.locals.user, req.query);
     const data = await getter(CashFlow, query, req, res, CashFlow.getFields('listing'));
 
     return next(SendData(data));
@@ -107,6 +114,39 @@ module.exports.delete = async ({ params: { id } }, { locals: { user } }, next) =
     await data.softDelete();
 
     return next(SendData({ message: 'CashFlow deleted successfully' }));
+  } catch (err) {
+    return next(ServerError(err));
+  }
+};
+
+module.exports.groupByMonth = async (req, { locals: { user } }, next) => {
+  try {
+    const query = cashflowQuery(user, req.query);
+    const data = await CashFlow.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: { date: { $dateToString: { format: '%Y-%m', date: '$date' } }, type: '$type' },
+          total: { $sum: '$amount' }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id.date',
+          items: { $push: { type: '$_id.type', total: '$total' } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: '$_id',
+          data: { $arrayToObject: { $map: { input: '$items', as: 'item', in: ['$$item.type', '$$item.total'] } } }
+        }
+      },
+      { $sort: { date: 1 } }
+    ]);
+
+    return next(SendData(data));
   } catch (err) {
     return next(ServerError(err));
   }

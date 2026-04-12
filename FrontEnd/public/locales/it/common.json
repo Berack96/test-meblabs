@@ -73,5 +73,25 @@
   },
   "validation": {
     "required": "Campo obbligatorio"
+  },
+  "cashflow": {
+    "title": "Flusso di cassa",
+    "period": "Periodo (Mesi)",
+    "table": {
+      "date": "Data",
+      "dateMin": "Data Inizio",
+      "dateMax": "Data Fine",
+      "type": "Tipo",
+      "category": "Categoria",
+      "amount": "Importo",
+      "amountMin": "Importo Minimo",
+      "amountMax": "Importo Massimo",
+      "description": "Descrizione"
+    },
+    "type": {
+      "income": "Entrata",
+      "expense": "Uscita",
+      "net": "Saldo"
+    }
   }
 }

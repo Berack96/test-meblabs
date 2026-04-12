@@ -12,6 +12,7 @@ import Sidebar from '../components/core/layout/Sidebar';
 import Login from '../components/core/user/Login';
 import ChangePassword from '../components/core/user/ChangePassword';
 import Home from './Home';
+import Cashflow from './Cashflow';
 
 import AuthRoute from '../components/routes/AuthRoute';
 import GuestRoute from '../components/routes/GuestRoute';
@@ -40,6 +41,23 @@ const Index = () => {
         </Layout>
       ),
       children: [{ path: '/', index: true, element: <Home /> }]
+    },
+    {
+      path: '/cashflows',
+      element: (
+        <Layout className="min-h-[100vh]">
+          <AuthRoute outlet={false}>
+            <Header />
+            <Layout>
+              <Sidebar />
+              <Content>
+                <Outlet />
+              </Content>
+            </Layout>
+          </AuthRoute>
+        </Layout>
+      ),
+      children: [{ index: true, element: <Cashflow /> }]
     },
     {
       path: '/',

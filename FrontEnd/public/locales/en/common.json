@@ -73,5 +73,25 @@
   },
   "validation": {
     "required": "Required field"
+  },
+  "cashflow": {
+    "title": "Cashflow",
+    "period": "Period (Months)",
+    "table": {
+      "date": "Date",
+      "dateMin": "Date Start",
+      "dateMax": "Date End",
+      "type": "Type",
+      "category": "Category",
+      "amount": "Amount",
+      "amountMin": "Amount Min",
+      "amountMax": "Amount Max",
+      "description": "Description"
+    },
+    "type": {
+      "income": "Income",
+      "expense": "Expense",
+      "net": "Net"
+    }
   }
 }
