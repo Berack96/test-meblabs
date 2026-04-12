@@ -34,7 +34,12 @@ const Cashflow = () => {
   const [filtersForm] = Form.useForm();
   const [queryFilters, setQueryFilters] = useState({});
   const filters = useFilters('cashflow');
-  const onFilterSubmit = () => setQueryFilters(filtersForm.getFieldsValue());
+  const onFilterSubmit = () => {
+    const values = filtersForm.getFieldsValue();
+    values.dateMin = values.dateMin ? values.dateMin.startOf('day').toISOString() : undefined;
+    values.dateMax = values.dateMax ? values.dateMax.endOf('day').toISOString() : undefined;
+    setQueryFilters(values);
+  };
   const onFilterClear = formToClear => {
     filters.onClearFilters(formToClear);
     setQueryFilters({});
