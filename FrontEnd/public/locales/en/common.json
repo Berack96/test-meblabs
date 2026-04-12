@@ -76,6 +76,7 @@
   },
   "cashflow": {
     "title": "Cashflow",
+    "period": "Period (Months)",
     "table": {
       "date": "Date",
       "dateMin": "Date Start",
@@ -89,7 +90,8 @@
     },
     "type": {
       "income": "Income",
-      "expense": "Expense"
+      "expense": "Expense",
+      "net": "Net"
     }
   }
 }

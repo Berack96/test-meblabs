@@ -191,6 +191,119 @@ describe('Role: Superuser', () => {
 });
 
 describe('Role: Admin', () => {
+  describe('GET /cashflows', () => {
+    test('Filter own cashflows by type', async () => {
+      await createCashflow({
+        userId: admin.id,
+        company: company1,
+        date: new Date('2026-02-10T10:00:00.000Z'),
+        type: 'expense',
+        amount: 3200,
+        category: 'travel',
+        description: 'Train ticket'
+      });
+
+      return agent
+        .get('/cashflows?type=expense&sorter=date')
+        .set('Cookie', `accessToken=${adminToken}`)
+        .expect(200)
+        .then(res => {
+          expect(res.body).toStrictEqual([
+            {
+              _id: expect.any(String),
+              type: 'expense',
+              amount: 3200,
+              date: '2026-02-10T10:00:00.000Z',
+              category: 'travel',
+              createdAt: expect.any(String)
+            }
+          ]);
+        });
+    });
+  });
+
+  describe('GET /cashflows/summary', () => {
+    test('Group own cashflows by month', async () => {
+      await createCashflow({
+        userId: admin.id,
+        company: company1,
+        date: new Date('2026-01-20T10:00:00.000Z'),
+        type: 'expense',
+        amount: 2000,
+        category: 'office',
+        description: 'Office chairs'
+      });
+
+      await createCashflow({
+        userId: admin.id,
+        company: company1,
+        date: new Date('2026-02-01T09:00:00.000Z'),
+        type: 'income',
+        amount: 1000,
+        category: 'bonus',
+        description: 'Project bonus'
+      });
+
+      return agent
+        .get('/cashflows/summary')
+        .set('Cookie', `accessToken=${adminToken}`)
+        .expect(200)
+        .then(res => {
+          expect(res.body).toStrictEqual([
+            {
+              _id: { year: 2026, month: 1 },
+              total: 152000,
+              average: 76000,
+              count: 2
+            },
+            {
+              _id: { year: 2026, month: 2 },
+              total: 1000,
+              average: 1000,
+              count: 1
+            }
+          ]);
+        });
+    });
+
+    test('Apply query filters on summary', async () => {
+      await createCashflow({
+        userId: admin.id,
+        company: company1,
+        date: new Date('2026-02-01T09:00:00.000Z'),
+        type: 'expense',
+        amount: 1000,
+        category: 'office',
+        description: 'Office supplies'
+      });
+
+      await createCashflow({
+        userId: admin.id,
+        company: company1,
+        date: new Date('2026-02-10T09:00:00.000Z'),
+        type: 'expense',
+        amount: 3000,
+        category: 'office',
+        description: 'New monitor'
+      });
+
+      return agent
+        .get('/cashflows/summary?type=expense&amountMin=2000&dateMin=2026-02-01T00:00:00.000Z')
+        .set('Cookie', `accessToken=${adminToken}`)
+        .expect(200)
+        .then(res => {
+          expect(res.body).toStrictEqual([
+            {
+              _id: { year: 2026, month: 2 },
+              total: 3000,
+              average: 3000,
+              count: 1
+            }
+          ]);
+        });
+    });
+  });
+
   describe('POST /companies/:companyId/cashflows', () => {
     test('Create a cashflow', () =>
       agent

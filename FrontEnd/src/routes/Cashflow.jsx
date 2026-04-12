@@ -140,7 +140,7 @@ const Cashflow = () => {
     async function fetchData() {
       try {
         setLoading(true);
-        const response = await CashFlowApi.list(queryFilters);
+        const response = await CashFlowApi.list({ ...queryFilters, sorter: '-date' });
         setDataSource(response.data);
       } catch (error) {
         msgErr('cashflow-load', error);
@@ -228,7 +228,7 @@ const Cashflow = () => {
         deleteSaveButtonOnRow
         onEdit={record => openModal(record)}
         editCancelButtonOnRow
-        pagination={false}
+        pagination={{ pageSize: 20, showSizeChanger: true }}
       />
       <Modal title={t('cashflow.title')} open={isModalOpen} onCancel={closeModal} onOk={onModalSubmit}>
         <Form form={form} layout="horizontal">

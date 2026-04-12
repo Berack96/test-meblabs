@@ -76,6 +76,7 @@
   },
   "cashflow": {
     "title": "Flusso di cassa",
+    "period": "Periodo (Mesi)",
     "table": {
       "date": "Data",
       "dateMin": "Data Inizio",
@@ -89,7 +90,8 @@
     },
     "type": {
       "income": "Entrata",
-      "expense": "Uscita"
+      "expense": "Uscita",
+      "net": "Saldo"
     }
   }
 }

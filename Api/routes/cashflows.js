@@ -12,6 +12,10 @@ router
   .post(validator('createCashFlow'), isAuth, rbac('cashflows', 'create'), controller.create);
 
 router
+  .route('/summary')
+  .get(validator({ query: 'cashflowQuery' }), isAuth, rbac('cashflows', 'read'), controller.groupByMonth);
+
+router
   .route('/:id')
   .get(validator({ params: 'id' }), isAuth, rbac('cashflows', 'read'), controller.getById)
   .patch(validator({ params: 'id', body: 'updateCashFlow' }), isAuth, rbac('cashflows', 'update'), controller.update)
