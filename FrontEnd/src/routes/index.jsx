@@ -57,7 +57,7 @@ const Index = () => {
           </AuthRoute>
         </Layout>
       ),
-      children: [{ path: '', index: true, element: <Cashflow /> }]
+      children: [{ index: true, element: <Cashflow /> }]
     },
     {
       path: '/',

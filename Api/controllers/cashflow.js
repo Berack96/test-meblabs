@@ -146,7 +146,6 @@ module.exports.groupByMonth = async (req, { locals: { user } }, next) => {
       { $sort: { date: 1 } }
     ]);
 
-    console.log(data);
     return next(SendData(data));
   } catch (err) {
     return next(ServerError(err));

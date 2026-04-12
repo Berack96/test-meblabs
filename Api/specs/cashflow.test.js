@@ -251,16 +251,17 @@ describe('Role: Admin', () => {
         .then(res => {
           expect(res.body).toStrictEqual([
             {
-              _id: { year: 2026, month: 1 },
-              total: 152000,
-              average: 76000,
-              count: 2
+              date: '2026-01',
+              data: {
+                income: 150000,
+                expense: 2000
+              }
             },
             {
-              _id: { year: 2026, month: 2 },
-              total: 1000,
-              average: 1000,
-              count: 1
+              date: '2026-02',
+              data: {
+                income: 1000
+              }
             }
           ]);
         });
@@ -294,10 +295,10 @@ describe('Role: Admin', () => {
         .then(res => {
           expect(res.body).toStrictEqual([
             {
-              _id: { year: 2026, month: 2 },
-              total: 3000,
-              average: 3000,
-              count: 1
+              date: '2026-02',
+              data: {
+                expense: 3000
+              }
             }
           ]);
         });

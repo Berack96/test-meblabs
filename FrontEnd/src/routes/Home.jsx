@@ -22,7 +22,7 @@ const Home = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const startDate = dayjs().subtract(months, 'month').startOf('month').toDate();
+        const startDate = dayjs().subtract(months, 'month').startOf('month').toISOString();
         const response = await CashFlowApi.listSummary({ dateMin: startDate });
         setData(response.data);
       } catch (error) {
@@ -33,7 +33,7 @@ const Home = () => {
     };
 
     loadData();
-  }, [months]);
+  }, [msgErr, months]);
 
   const summary = useMemo(() => {
     const income = data.reduce((acc, e) => acc + (e.data.income || 0), 0);
